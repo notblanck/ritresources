@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REWARE — Login / Sign Up</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background: linear-gradient(135deg, #c6c9e0 0%, #d5d8e8 50%, #e2e5f0 100%);
+    font-family: 'Montserrat', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Back to Home Link */
+  .back-link {
+    position: absolute;
+    top: 24px;
+    left: 28px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: #5c6bc0;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    z-index: 100;
+  }
+  .back-link:hover {
+    background: rgba(255,255,255,0.95);
+    transform: translateX(-3px);
+    box-shadow: 0 4px 15px rgba(92,107,192,0.15);
+  }
+  .back-link svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    color: #333;
+    font-size: 34px;
+    margin-bottom: 10px;
+    margin-top: 20px;
+    letter-spacing: -0.5px;
+  }
+
+  .social-container {
+    margin: 20px 0;
+  }
+
+  .social-container a {
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 6px;
+    height: 42px;
+    width: 42px;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .social-container a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+  }
+  .social-container a svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .container {
+    background-color: #fff;
+    border-radius: 20px;
+    box-shadow: 0 14px 28px rgba(0,0,0,0.08), 0 10px 10px rgba(0,0,0,0.04);
+    position: relative;
+    overflow: hidden;
+    width: 768px;
+    max-width: 100%;
+    min-height: 520px;
+  }
+
+  .form-container {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    transition: all 0.6s ease-in-out;
+  }
+
+  .sign-in-container {
+    left: 0;
+    width: 50%;
+    z-index: 2;
+  }
+
+  .container.right-panel-active .sign-in-container {
+    transform: translateX(100%);
+  }
+
+  .sign-up-container {
+    left: 0;
+    width: 50%;
+    opacity: 0;
+    z-index: 1;
+  }
+
+  .container.right-panel-active .sign-up-container {
+    transform: translateX(100%);
+    opacity: 1;
+    z-index: 5;
+    animation: show 0.6s;
+  }
+
+  @keyframes show {
+    0%, 49.99% {
+      opacity: 0;
+      z-index: 1;
+    }
+    50%, 100% {
+      opacity: 1;
+      z-index: 5;
+    }
+  }
+
+  .overlay-container {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    transition: transform 0.6s ease-in-out;
+    z-index: 100;
+  }
+
+  .container.right-panel-active .overlay-container {
+    transform: translateX(-100%);
+  }
+
+  .overlay {
+    background: linear-gradient(135deg, #512da8, #5c6bc0);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 0 0;
+    color: #FFFFFF;
+    position: relative;
+    left: -100%;
+    height: 100%;
+    width: 200%;
+    transform: translateX(0);
+    transition: transform 0.6s ease-in-out;
+  }
+
+  .container.right-panel-active .overlay {
+    transform: translateX(50%);
+  }
+
+  .overlay-panel {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 40px;
+    text-align: center;
+    top: 0;
+    height: 100%;
+    width: 50%;
+    transform: translateX(0);
+    transition: transform 0.6s ease-in-out;
+  }
+
+  .overlay-left {
+    transform: translateX(-20%);
+  }
+
+  .container.right-panel-active .overlay-left {
+    transform: translateX(0);
+  }
+
+  .overlay-right {
+    right: 0;
+    transform: translateX(0);
+  }
+
+  .container.right-panel-active .overlay-right {
+    transform: translateX(20%);
+  }
+
+  form {
+    background-color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 50px;
+    height: 100%;
+    text-align: center;
+  }
+
+  h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    color: #333;
+    font-size: 24px;
+    margin-bottom: 14px;
+  }
+
+  .overlay-panel h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    color: #fff;
+    font-size: 28px;
+    margin-bottom: 10px;
+  }
+
+  .overlay-panel p {
+    font-size: 13px;
+    font-weight: 300;
+    line-height: 20px;
+    letter-spacing: 0.5px;
+    margin: 20px 0 30px;
+    color: rgba(255,255,255,0.85);
+  }
+
+  .overlay-panel .sub-text {
+    font-size: 12px;
+    font-weight: 300;
+    line-height: 18px;
+    letter-spacing: 0.4px;
+    margin-bottom: 20px;
+    color: rgba(255,255,255,0.7);
+  }
+
+  input {
+    background-color: #eee;
+    border: none;
+    padding: 14px 16px;
+    margin: 8px 0;
+    width: 100%;
+    border-radius: 10px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    color: #333;
+    outline: none;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  input::placeholder {
+    color: #999;
+    font-weight: 400;
+  }
+  input:focus {
+    background-color: #e8e8e8;
+    box-shadow: 0 0 0 2px rgba(81,45,168,0.15);
+  }
+
+  a.forgot-link {
+    color: #5c6bc0;
+    font-size: 13px;
+    text-decoration: none;
+    margin: 10px 0;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+  a.forgot-link:hover {
+    color: #512da8;
+  }
+
+  button {
+    border-radius: 25px;
+    border: 1px solid #5c6bc0;
+    background-color: #5c6bc0;
+    color: #FFFFFF;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 14px 48px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    margin-top: 10px;
+  }
+  button:hover {
+    background-color: #512da8;
+    border-color: #512da8;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(81,45,168,0.3);
+  }
+  button.ghost {
+    background-color: transparent;
+    border-color: #FFFFFF;
+  }
+  button.ghost:hover {
+    background-color: rgba(255,255,255,0.15);
+    border-color: #fff;
+  }
+
+  .form-container p.small-text {
+    font-size: 12px;
+    color: #999;
+    margin-top: 16px;
+    font-weight: 400;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .container {
+      width: 95vw;
+      min-height: 480px;
+    }
+    .form-container {
+      width: 100%;
+      height: 50%;
+      position: absolute;
+    }
+    .sign-in-container {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+    }
+    .sign-up-container {
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 50%;
+    }
+    .container.right-panel-active .sign-in-container {
+      transform: translateY(-100%);
+    }
+    .container.right-panel-active .sign-up-container {
+      transform: translateY(0);
+    }
+    .overlay-container {
+      display: none;
+    }
+    .social-container {
+      margin: 12px 0;
+    }
+    h1 {
+      font-size: 26px;
+    }
+  }
+
+  /* Brand watermark */
+  .brand-watermark {
+    position: absolute;
+    bottom: 16px;
+    right: 24px;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: #aaa;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  /* Success animation */
+  .success-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+  .success-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .success-overlay svg {
+    width: 64px;
+    height: 64px;
+    color: #4CAF50;
+    margin-bottom: 16px;
+  }
+  .success-overlay p {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+  }
+</style>
+</head>
+<body>
+
+<a href="index.html" class="back-link">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+  Back to Home
+</a>
+
+<h1>REWARE</h1>
+
+<div class="container" id="container">
+  <!-- Sign Up Form -->
+  <div class="form-container sign-up-container">
+    <form id="signUpForm">
+      <h1>Create Account</h1>
+      <div class="social-container">
+        <a href="#" title="Google"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg></a>
+        <a href="#" title="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+        <a href="#" title="GitHub"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a>
+        <a href="#" title="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+      </div>
+      <span class="small-text">or use your email for registration</span>
+      <input type="text" id="signUpName" placeholder="Name" required />
+      <input type="email" id="signUpEmail" placeholder="Email" required />
+      <input type="password" id="signUpPassword" placeholder="Password" required />
+      <input type="password" id="signUpConfirm" placeholder="Confirm Password" required />
+      <button type="submit">Sign Up</button>
+    </form>
+  </div>
+
+  <!-- Sign In Form -->
+  <div class="form-container sign-in-container">
+    <form id="signInForm">
+      <h1>Sign In</h1>
+      <div class="social-container">
+        <a href="#" title="Google"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg></a>
+        <a href="#" title="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+        <a href="#" title="GitHub"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a>
+        <a href="#" title="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+      </div>
+      <span class="small-text">or use your account</span>
+      <input type="email" id="signInEmail" placeholder="Email" required />
+      <input type="password" id="signInPassword" placeholder="Password" required />
+      <a href="#" class="forgot-link">Forgot your password?</a>
+      <button type="submit">Sign In</button>
+    </form>
+  </div>
+
+  <!-- Overlay -->
+  <div class="overlay-container">
+    <div class="overlay">
+      <div class="overlay-panel overlay-left">
+        <h1>Welcome Back!</h1>
+        <p class="sub-text">To keep connected with us please login with your personal info</p>
+        <button class="ghost" id="signIn">Sign In</button>
+      </div>
+      <div class="overlay-panel overlay-right">
+        <h1>Hello, Friend!</h1>
+        <p class="sub-text">Enter your personal details and start journey with REWARE</p>
+        <button class="ghost" id="signUp">Sign Up</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="brand-watermark">REWARE — RIT Chennai</div>
+
+<!-- Success Overlay -->
+<div class="success-overlay" id="successOverlay">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+    <polyline points="22 4 12 14.01 9 11.01"/>
+  </svg>
+  <p id="successMessage">Welcome to REWARE!</p>
+</div>
+
+<script>
+  const signUpButton = document.getElementById('signUp');
+  const signInButton = document.getElementById('signIn');
+  const container = document.getElementById('container');
+
+  signUpButton.addEventListener('click', () => {
+    container.classList.add('right-panel-active');
+  });
+
+  signInButton.addEventListener('click', () => {
+    container.classList.remove('right-panel-active');
+  });
+
+  // Sign In handler
+  document.getElementById('signInForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const email = document.getElementById('signInEmail').value;
+    const password = document.getElementById('signInPassword').value;
+
+    if (!email || !password) {
+      shakeForm(this);
+      return;
+    }
+
+    // Store user session
+    const user = { email: email, name: email.split('@')[0], loggedIn: true };
+    localStorage.setItem('rewareUser', JSON.stringify(user));
+
+    showSuccess('Welcome back to REWARE!');
+  });
+
+  // Sign Up handler
+  document.getElementById('signUpForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const name = document.getElementById('signUpName').value;
+    const email = document.getElementById('signUpEmail').value;
+    const password = document.getElementById('signUpPassword').value;
+    const confirm = document.getElementById('signUpConfirm').value;
+
+    if (!name || !email || !password || !confirm) {
+      shakeForm(this);
+      return;
+    }
+
+    if (password !== confirm) {
+      shakeForm(this);
+      return;
+    }
+
+    // Store user session
+    const user = { email: email, name: name, loggedIn: true };
+    localStorage.setItem('rewareUser', JSON.stringify(user));
+
+    showSuccess('Account created! Welcome to REWARE.');
+  });
+
+  function showSuccess(msg) {
+    const overlay = document.getElementById('successOverlay');
+    document.getElementById('successMessage').textContent = msg;
+    overlay.classList.add('show');
+    setTimeout(() => {
+      overlay.classList.remove('show');
+      window.location.href = 'index.html';
+    }, 2000);
+  }
+
+  function shakeForm(form) {
+    form.style.animation = 'shake 0.4s ease';
+    setTimeout(() => { form.style.animation = ''; }, 400);
+  }
+
+  // Add shake keyframes dynamically
+  const shakeStyle = document.createElement('style');
+  shakeStyle.textContent = `
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-6px); }
+      80% { transform: translateX(6px); }
+    }
+  `;
+  document.head.appendChild(shakeStyle);
+
+  // Forgot password handler
+  document.querySelector('.forgot-link').addEventListener('click', function(e) {
+    e.preventDefault();
+    const email = document.getElementById('signInEmail').value;
+    if (!email) {
+      alert('Please enter your email address first.');
+      return;
+    }
+    alert('Password reset link sent to ' + email + ' (demo mode)');
+  });
+</script>
+</body>
+</html>
