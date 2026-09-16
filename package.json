@@ -1,0 +1,14 @@
+{
+  "name": "ritresources",
+  "version": "1.0.0",
+  "private": true,
+  "description": "REWARE — Academic Resource Sharing Platform for RIT Chennai",
+  "scripts": {
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "build:server": "npm --prefix server run build",
+    "build:client": "npm --prefix client run build",
+    "build": "npm run build:server && npm run build:client",
+    "start": "npm --prefix server start"
+  }
+}
