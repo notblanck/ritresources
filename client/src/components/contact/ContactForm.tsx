@@ -34,7 +34,7 @@ export const ContactForm: React.FC = () => {
     <div className="page-wrap" id="view-contact">
       <div className="page-header" style={{ textAlign: 'center' }}>
         <h2>Get in <span>Touch</span></h2>
-        <p>Questions, feedback, or want to help build REWARE? Reach out.</p>
+        <p>Questions, feedback, or want to help build ritresources? Reach out.</p>
       </div>
       <div className="contact-card">
         <form onSubmit={handleSubmit}>

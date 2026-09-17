@@ -57,7 +57,7 @@ export const DepartmentGrid: React.FC<DepartmentGridProps> = ({ highlightDept })
         <div className="dept-full">CSE</div>
         <h4>Computer Science &amp; Engineering</h4>
         <p>
-          The core computing track — algorithms, systems, networks, and software engineering. The largest resource-sharing department on REWARE, with the deepest archive of PYQs and lab manuals.
+          The core computing track — algorithms, systems, networks, and software engineering. The largest resource-sharing department on ritresources, with the deepest archive of PYQs and lab manuals.
         </p>
       </div>
 
@@ -128,7 +128,7 @@ export const DepartmentGrid: React.FC<DepartmentGridProps> = ({ highlightDept })
         <div className="dept-full">RIT Chennai</div>
         <h4>Believe in the Possibilities</h4>
         <p>
-          REWARE is a student-built initiative at Rajalakshmi Institute of Technology — more departments and resource categories are added every semester as the platform grows.
+          ritresources is a student-built initiative at Rajalakshmi Institute of Technology — more departments and resource categories are added every semester as the platform grows.
         </p>
       </div>
     </div>

@@ -72,6 +72,15 @@ header.app-header {
   cursor: pointer;
 }
 
+.brand-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  box-shadow: 0 2px 8px rgba(11, 30, 77, 0.16);
+}
+
 .brand-mark {
   width: 34px;
   height: 34px;
@@ -451,11 +460,12 @@ p.lede {
 }
 
 .medallion-mark img {
-  width: auto;
+  width: 64px;
   height: 64px;
-  max-width: 100px;
-  object-fit: contain;
+  border-radius: 50%;
+  object-fit: cover;
   display: block;
+  box-shadow: 0 4px 14px rgba(11, 30, 77, 0.14);
 }
 
 .medallion-title {

@@ -21,7 +21,7 @@ app.get('/api/health', (req, res) => {
     res.json({
         status: 'ok',
         timestamp: new Date().toISOString(),
-        service: 'REWARE API',
+        service: 'ritresources API',
         supabaseConnected: Boolean(process.env.SUPABASE_URL && !process.env.SUPABASE_URL.includes('your-project'))
     });
 });
@@ -36,7 +36,7 @@ app.use((req, res) => {
 // Error handling middleware
 app.use(errorHandler);
 app.listen(PORT, () => {
-    console.log(`🚀 REWARE API Server running on port ${PORT}`);
+    console.log(`🚀 ritresources API Server running on port ${PORT}`);
     console.log(`📡 Health endpoint: http://localhost:${PORT}/api/health`);
     console.log(`📚 Resources endpoint: http://localhost:${PORT}/api/resources`);
 });

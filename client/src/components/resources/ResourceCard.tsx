@@ -52,7 +52,7 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
       } else {
         // Create demo mock download blob
         const mockBlob = new Blob(
-          [`REWARE Resource Content\n\nTitle: ${resource.title}\nSubject: ${resource.subject}\nType: ${resource.type}\nDepartment: ${resource.dept_id}\nSemester: ${resource.semester}\nDescription: ${resource.description || 'N/A'}\n`],
+          [`ritresources Content\n\nTitle: ${resource.title}\nSubject: ${resource.subject}\nType: ${resource.type}\nDepartment: ${resource.dept_id}\nSemester: ${resource.semester}\nDescription: ${resource.description || 'N/A'}\n`],
           { type: 'text/plain' }
         );
         const url = URL.createObjectURL(mockBlob);

@@ -13,7 +13,7 @@ export const SlidingAuth: React.FC<SlidingAuthProps> = ({ onBackToHome, onSucces
 
   const [isRightPanelActive, setIsRightPanelActive] = useState(false);
   const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
-  const [successMsg, setSuccessMsg] = useState('Welcome to REWARE!');
+  const [successMsg, setSuccessMsg] = useState('Welcome to ritresources!');
   const [shakeSignIn, setShakeSignIn] = useState(false);
   const [shakeSignUp, setShakeSignUp] = useState(false);
 
@@ -47,7 +47,7 @@ export const SlidingAuth: React.FC<SlidingAuthProps> = ({ onBackToHome, onSucces
 
     try {
       await login(signInEmail.trim(), signInPassword);
-      triggerSuccess('Welcome back to REWARE!');
+      triggerSuccess('Welcome back to ritresources!');
     } catch (err: any) {
       setShakeSignIn(true);
       setTimeout(() => setShakeSignIn(false), 400);
@@ -73,7 +73,7 @@ export const SlidingAuth: React.FC<SlidingAuthProps> = ({ onBackToHome, onSucces
 
     try {
       await signup(signUpName.trim(), signUpEmail.trim(), signUpPassword);
-      triggerSuccess('Account created! Welcome to REWARE.');
+      triggerSuccess('Account created! Welcome to ritresources.');
     } catch (err: any) {
       setShakeSignUp(true);
       setTimeout(() => setShakeSignUp(false), 400);
@@ -99,7 +99,10 @@ export const SlidingAuth: React.FC<SlidingAuthProps> = ({ onBackToHome, onSucces
         Back to Home
       </button>
 
-      <h1 className="auth-headline">REWARE</h1>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '16px' }}>
+        <img src="/logo.png" alt="ritresources" style={{ width: 42, height: 42, borderRadius: '50%', objectFit: 'cover' }} />
+        <h1 className="auth-headline" style={{ margin: 0 }}>ritresources</h1>
+      </div>
 
       <div className={`container-auth ${isRightPanelActive ? 'right-panel-active' : ''}`} id="container">
         {/* Sign Up Container */}
@@ -199,7 +202,7 @@ export const SlidingAuth: React.FC<SlidingAuthProps> = ({ onBackToHome, onSucces
             </div>
             <div className="overlay-panel overlay-right">
               <h1>Hello, Friend!</h1>
-              <p>Enter your personal details and start journey with REWARE</p>
+              <p>Enter your personal details and start journey with ritresources</p>
               <button className="btn-auth ghost" id="signUp" onClick={() => setIsRightPanelActive(true)}>
                 Sign Up
               </button>
@@ -208,7 +211,7 @@ export const SlidingAuth: React.FC<SlidingAuthProps> = ({ onBackToHome, onSucces
         </div>
       </div>
 
-      <div className="brand-watermark">REWARE — RIT Chennai</div>
+      <div className="brand-watermark">ritresources — RIT Chennai</div>
 
       {/* Success Animation Overlay */}
       <div className={`success-overlay ${showSuccessOverlay ? 'show' : ''}`} id="successOverlay">

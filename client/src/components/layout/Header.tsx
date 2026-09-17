@@ -29,15 +29,8 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onNavigate }) => {
   return (
     <header className="app-header">
       <div className="brand" onClick={() => onNavigate('home')}>
-        <div className="brand-mark">
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-            <rect x="4" y="4" width="6" height="6" rx="1" />
-            <rect x="14" y="4" width="6" height="6" rx="1" />
-            <rect x="4" y="14" width="6" height="6" rx="1" />
-            <rect x="14" y="14" width="6" height="6" rx="1" />
-          </svg>
-        </div>
-        <div className="brand-name">REWARE</div>
+        <img src="/logo.png" alt="ritresources" className="brand-logo" />
+        <div className="brand-name">RITRESOURCES</div>
       </div>
 
       <nav className="pillnav">

@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>REWARE — Login / Sign Up</title>
+<title>ritresources — Login / Sign Up</title>
+<link rel="icon" type="image/png" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -419,7 +420,10 @@
   Back to Home
 </a>
 
-<h1>REWARE</h1>
+<div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:16px;">
+  <img src="logo.png" alt="ritresources" style="width:42px;height:42px;border-radius:50%;object-fit:cover;">
+  <h1 style="margin:0;">ritresources</h1>
+</div>
 
 <div class="container" id="container">
   <!-- Sign Up Form -->
@@ -469,14 +473,14 @@
       </div>
       <div class="overlay-panel overlay-right">
         <h1>Hello, Friend!</h1>
-        <p class="sub-text">Enter your personal details and start journey with REWARE</p>
+        <p class="sub-text">Enter your personal details and start journey with ritresources</p>
         <button class="ghost" id="signUp">Sign Up</button>
       </div>
     </div>
   </div>
 </div>
 
-<div class="brand-watermark">REWARE — RIT Chennai</div>
+<div class="brand-watermark">ritresources — RIT Chennai</div>
 
 <!-- Success Overlay -->
 <div class="success-overlay" id="successOverlay">
@@ -484,7 +488,7 @@
     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
     <polyline points="22 4 12 14.01 9 11.01"/>
   </svg>
-  <p id="successMessage">Welcome to REWARE!</p>
+  <p id="successMessage">Welcome to ritresources!</p>
 </div>
 
 <script>
@@ -513,9 +517,9 @@
 
     // Store user session
     const user = { email: email, name: email.split('@')[0], loggedIn: true };
-    localStorage.setItem('rewareUser', JSON.stringify(user));
+    localStorage.setItem('ritresources_user', JSON.stringify(user));
 
-    showSuccess('Welcome back to REWARE!');
+    showSuccess('Welcome back to ritresources!');
   });
 
   // Sign Up handler
@@ -538,9 +542,9 @@
 
     // Store user session
     const user = { email: email, name: name, loggedIn: true };
-    localStorage.setItem('rewareUser', JSON.stringify(user));
+    localStorage.setItem('ritresources_user', JSON.stringify(user));
 
-    showSuccess('Account created! Welcome to REWARE.');
+    showSuccess('Account created! Welcome to ritresources.');
   });
 
   function showSuccess(msg) {

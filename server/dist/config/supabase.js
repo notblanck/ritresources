@@ -39,7 +39,7 @@ export const DEFAULT_DEPARTMENTS = [
         id: 'CSE',
         name: 'CSE',
         full_name: 'Computer Science & Engineering',
-        description: 'The core computing track — algorithms, systems, networks, and software engineering. The largest resource-sharing department on REWARE, with the deepest archive of PYQs and lab manuals.',
+        description: 'The core computing track — algorithms, systems, networks, and software engineering. The largest resource-sharing department on ritresources, with the deepest archive of PYQs and lab manuals.',
         icon_gradient: 'linear-gradient(135deg,#0B1E4D,#1E4FDB)',
         display_order: 2
     },

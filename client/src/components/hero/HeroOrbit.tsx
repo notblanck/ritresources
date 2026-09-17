@@ -192,13 +192,9 @@ export const HeroOrbit: React.FC = () => {
         <div className="medallion">
           <div>
             <div className="medallion-mark">
-              <svg viewBox="0 0 100 70" width="80" height="56" fill="none" style={{ margin: '0 auto 4px' }}>
-                <rect width="100" height="70" rx="8" fill="#0B1E4D" />
-                <path d="M20 20h60v6H20zM20 32h40v6H20zM20 44h50v6H20z" fill="#3D8BFF" />
-                <circle cx="75" cy="40" r="10" fill="#FF8A00" />
-              </svg>
+              <img src="/logo.png" alt="ritresources" />
             </div>
-            <div className="medallion-title">REWARE</div>
+            <div className="medallion-title">RITRESOURCES</div>
             <div className="medallion-sub">RAJALAKSHMI INSTITUTE OF TECHNOLOGY</div>
             <div className="medallion-tag">BELIEVE IN THE POSSIBILITIES</div>
           </div>

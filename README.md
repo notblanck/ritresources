@@ -1,6 +1,6 @@
-# REWARE — Academic Resource Sharing Platform
+# ritresources — Academic Resource Sharing Platform
 
-REWARE is a centralized academic resource-sharing platform built for RIT Chennai, replacing scattered WhatsApp forwards of notes, assignments, question papers, and coding resources with one organized, searchable hub.
+ritresources is a centralized academic resource-sharing platform built for RIT Chennai, replacing scattered WhatsApp forwards of notes, assignments, question papers, and coding resources with one organized, searchable hub.
 
 ## Live Demo
 
@@ -16,7 +16,7 @@ This is a front-end demo (no backend) built as a single self-contained HTML file
 - **Departments** — dropdown covering CSBS, CSE, AI & DS, AI & ML, and VLSI Design, linking into...
 - **About** — department overview cards and platform stats
 
-`reware-hero-only.html` contains just the landing/hero section on its own, if you want to reuse it separately.
+`ritresources-hero-only.html` contains just the landing/hero section on its own, if you want to reuse it separately.
 
 ## Tech
 

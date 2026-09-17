@@ -2,7 +2,7 @@
   "name": "ritresources",
   "version": "1.0.0",
   "private": true,
-  "description": "REWARE — Academic Resource Sharing Platform for RIT Chennai",
+  "description": "ritresources — Academic Resource Sharing Platform for RIT Chennai",
   "workspaces": [
     "client",
     "server"

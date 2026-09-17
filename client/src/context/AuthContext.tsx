@@ -15,7 +15,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(() => {
     try {
-      const stored = localStorage.getItem('rewareUser');
+      const stored = localStorage.getItem('ritresources_user') || localStorage.getItem('rewareUser');
       return stored ? JSON.parse(stored) : null;
     } catch {
       return null;
@@ -33,7 +33,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             loggedIn: true
           };
           setUser(profile);
-          localStorage.setItem('rewareUser', JSON.stringify(profile));
+          localStorage.setItem('ritresources_user', JSON.stringify(profile));
         }
       });
 
@@ -46,9 +46,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             loggedIn: true
           };
           setUser(profile);
-          localStorage.setItem('rewareUser', JSON.stringify(profile));
+          localStorage.setItem('ritresources_user', JSON.stringify(profile));
         } else {
           setUser(null);
+          localStorage.removeItem('ritresources_user');
           localStorage.removeItem('rewareUser');
         }
       });
@@ -60,18 +61,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = async (email: string, password: string) => {
     const profile = await signInWithSupabase(email, password);
     setUser(profile);
-    localStorage.setItem('rewareUser', JSON.stringify(profile));
+    localStorage.setItem('ritresources_user', JSON.stringify(profile));
   };
 
   const signup = async (name: string, email: string, password: string) => {
     const profile = await signUpWithSupabase(email, password, name);
     setUser(profile);
-    localStorage.setItem('rewareUser', JSON.stringify(profile));
+    localStorage.setItem('ritresources_user', JSON.stringify(profile));
   };
 
   const logout = async () => {
     await signOutWithSupabase();
     setUser(null);
+    localStorage.removeItem('ritresources_user');
     localStorage.removeItem('rewareUser');
   };
 

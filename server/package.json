@@ -1,7 +1,7 @@
 {
-  "name": "reware-server",
+  "name": "ritresources-server",
   "version": "1.0.0",
-  "description": "REWARE Academic Resource Sharing Backend API",
+  "description": "ritresources Academic Resource Sharing Backend API",
   "main": "dist/server.js",
   "type": "module",
   "scripts": {

@@ -11,14 +11,14 @@ export const AboutPage: React.FC<AboutPageProps> = ({ highlightDept }) => {
     <section id="view-about" className="view active">
       <div className="page-wrap">
         <div className="about-hero">
-          <h2 style={{ textAlign: 'center' }}>About <span>REWARE</span></h2>
+          <h2 style={{ textAlign: 'center' }}>About <span>ritresources</span></h2>
           <p>
-            REWARE is RIT Chennai's centralized academic resource-sharing platform — one home for the notes, assignments, question papers, and coding material that used to get lost in WhatsApp chats. Built by students, for students, across every department.
+            ritresources is RIT Chennai's centralized academic resource-sharing platform — one home for the notes, assignments, question papers, and coding material that used to get lost in WhatsApp chats. Built by students, for students, across every department.
           </p>
         </div>
 
         <h3 style={{ textAlign: 'center', fontSize: '20px', fontWeight: 800, color: 'var(--navy)', marginBottom: '6px' }}>
-          Departments on REWARE
+          Departments on ritresources
         </h3>
         <p style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '14px', marginBottom: '26px' }}>
           Tap a department from the nav to jump straight here.
