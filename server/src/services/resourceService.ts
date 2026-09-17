@@ -1,6 +1,7 @@
 import { supabase, isSupabaseConfigured, DEFAULT_RESOURCES } from '../config/supabase.js';
 import { Resource, ResourceFilterQuery } from '../types/index.js';
 import crypto from 'crypto';
+import fs from 'fs';
 
 // In-memory array for fallback mode if Supabase is not configured
 let localResources: Resource[] = [...DEFAULT_RESOURCES];
@@ -144,22 +145,31 @@ export async function createResource(resourceData: Partial<Resource>, file?: Exp
   let fileSize = file?.size || 0;
   let fileType = file?.mimetype || '';
 
-  if (file && isSupabaseConfigured() && supabase) {
-    try {
-      const cleanFileName = `${Date.now()}-${file.originalname.replace(/\s+/g, '_')}`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('resources')
-        .upload(cleanFileName, file.buffer, {
-          contentType: file.mimetype,
-          upsert: true
-        });
+  if (file) {
+    // Persistent local file path on server
+    fileUrl = `/uploads/${file.filename}`;
 
-      if (!uploadError && uploadData) {
-        const { data: publicUrlData } = supabase.storage.from('resources').getPublicUrl(cleanFileName);
-        fileUrl = publicUrlData.publicUrl;
+    // Also mirror to Supabase storage if connected
+    if (file.path && fs.existsSync(file.path) && isSupabaseConfigured() && supabase) {
+      try {
+        const cleanFileName = `files/${file.filename}`;
+        const fileBuffer = fs.readFileSync(file.path);
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('resources')
+          .upload(cleanFileName, fileBuffer, {
+            contentType: file.mimetype,
+            upsert: true
+          });
+
+        if (!uploadError && uploadData) {
+          const { data: publicUrlData } = supabase.storage.from('resources').getPublicUrl(cleanFileName);
+          if (publicUrlData?.publicUrl) {
+            fileUrl = publicUrlData.publicUrl;
+          }
+        }
+      } catch (err) {
+        console.warn('Storage upload error, using local server reference:', err);
       }
-    } catch (err) {
-      console.warn('Storage upload error, using local reference:', err);
     }
   }
 

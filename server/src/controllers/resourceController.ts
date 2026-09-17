@@ -1,4 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
+import path from 'path';
+import fs from 'fs';
 import * as resourceService from '../services/resourceService.js';
 import { ResourceFilterQuery } from '../types/index.js';
 
@@ -96,6 +98,52 @@ export async function downloadResource(req: Request, res: Response, next: NextFu
         file_url: updated.file_url
       }
     });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function streamDownloadResource(req: Request, res: Response, next: NextFunction) {
+  try {
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : String(req.params.id);
+    const resource = await resourceService.getResourceById(id);
+    if (!resource) {
+      return res.status(404).json({ success: false, message: 'Resource not found' });
+    }
+
+    // Register / increment download count
+    await resourceService.incrementDownload(id);
+
+    const fileName = resource.file_name || `${resource.title.replace(/[^a-zA-Z0-9_.-]/g, '_')}.pdf`;
+    const mimeType = resource.file_type || (fileName.endsWith('.pdf') ? 'application/pdf' : 'application/octet-stream');
+
+    // 1. Check local server uploads filesystem
+    if (resource.file_url) {
+      const cleanUrl = resource.file_url.split('?')[0];
+      const localFile = path.basename(cleanUrl);
+      const filePath = path.join(process.cwd(), 'uploads', localFile);
+      if (fs.existsSync(filePath)) {
+        res.setHeader('Content-Type', mimeType);
+        res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`);
+        return fs.createReadStream(filePath).pipe(res);
+      }
+    }
+
+    // 2. Check if file is stored as a remote URL (e.g. Supabase storage)
+    if (resource.file_url && resource.file_url.startsWith('http')) {
+      return res.redirect(resource.file_url);
+    }
+
+    // 3. Fallback for seed resources without physical files on disk:
+    // Generate valid document and stream back with proper headers
+    const content = `ritresources Academic Document\n\nTitle: ${resource.title}\nSubject: ${resource.subject}\nType: ${resource.type}\nDepartment: ${resource.dept_id}\nSemester: ${resource.semester}\nDescription: ${resource.description || 'N/A'}\n\nDownloaded from ritresources — Academic Resource Sharing Platform for RIT Chennai.`;
+    const fallbackBuffer = Buffer.from(content, 'utf-8');
+    const fallbackName = fileName.endsWith('.pdf') ? fileName.replace(/\.pdf$/i, '.txt') : fileName;
+
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fallbackName)}"`);
+    res.setHeader('Content-Length', fallbackBuffer.length);
+    return res.end(fallbackBuffer);
   } catch (error) {
     next(error);
   }

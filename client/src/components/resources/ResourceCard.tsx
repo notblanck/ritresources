@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { Resource } from '../../types/index.js';
-import { registerDownload } from '../../services/api.js';
+import { getResourceDownloadUrl } from '../../services/api.js';
 import { useToast } from '../../context/ToastContext.js';
 
 interface ResourceCardProps {
@@ -40,30 +40,20 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
   const color = TYPE_COLORS[resource.type] || '#1E4FDB';
   const dateLabel = formatDaysAgo(resource.days_ago, resource.created_at);
 
-  const handleDownload = async (e: React.MouseEvent) => {
+  const handleDownload = (e: React.MouseEvent) => {
     e.stopPropagation();
     try {
-      const result = await registerDownload(resource.id);
-      setDownloadCount(result.downloads_count || downloadCount + 1);
+      setDownloadCount((prev) => prev + 1);
       showToast(`Downloading "${resource.title}"...`);
 
-      if (resource.file_url) {
-        window.open(resource.file_url, '_blank');
-      } else {
-        // Create demo mock download blob
-        const mockBlob = new Blob(
-          [`ritresources Content\n\nTitle: ${resource.title}\nSubject: ${resource.subject}\nType: ${resource.type}\nDepartment: ${resource.dept_id}\nSemester: ${resource.semester}\nDescription: ${resource.description || 'N/A'}\n`],
-          { type: 'text/plain' }
-        );
-        const url = URL.createObjectURL(mockBlob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = resource.file_name || `${resource.title.replace(/\s+/g, '_')}.txt`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }
+      // Stream file directly from server download endpoint
+      const downloadUrl = getResourceDownloadUrl(resource.id);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = resource.file_name || `${resource.title.replace(/\s+/g, '_')}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     } catch (err) {
       console.warn('Download error:', err);
     }

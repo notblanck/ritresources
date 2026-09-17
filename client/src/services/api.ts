@@ -1,6 +1,9 @@
 import type { Resource, Department } from '../types/index.js';
+export const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+export function getResourceDownloadUrl(resourceId: string): string {
+  return `${API_BASE}/resources/${resourceId}/download`;
+}
 
 export interface GetResourcesParams {
   search?: string;

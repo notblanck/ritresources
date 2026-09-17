@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 import resourceRoutes from './routes/resourceRoutes.js';
 import departmentRoutes from './routes/departmentRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
@@ -20,6 +21,7 @@ app.use(cors({
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // Health check
 app.get('/api/health', (req, res) => {
