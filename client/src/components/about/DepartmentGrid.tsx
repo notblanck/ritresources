@@ -1,11 +1,77 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import type { Department } from '../../types/index.js';
+import { fetchDepartments } from '../../services/api.js';
 
 interface DepartmentGridProps {
   highlightDept?: string;
 }
 
+const DEPARTMENT_ICONS: Record<string, React.ReactNode> = {
+  CSBS: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+      <path d="M3 7l9-4 9 4-9 4-9-4z" />
+      <path d="M3 7v6c0 2 4 4 9 4s9-2 9-4V7" />
+    </svg>
+  ),
+  CSE: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+      <rect x="3" y="4" width="18" height="13" rx="2" />
+      <path d="M8 21h8M12 17v4" />
+    </svg>
+  ),
+  AIDS: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+      <path d="M4 19V9M10 19V5M16 19v-7M22 19V3" strokeLinecap="round" />
+    </svg>
+  ),
+  AIML: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" />
+    </svg>
+  ),
+  VLSI: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+      <rect x="6" y="6" width="12" height="12" rx="1" />
+      <path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4" />
+    </svg>
+  )
+};
+
+const DEFAULT_ICON = (
+  <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+  </svg>
+);
+
 export const DepartmentGrid: React.FC<DepartmentGridProps> = ({ highlightDept }) => {
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
+    fetchDepartments()
+      .then((data) => {
+        if (isMounted) {
+          setDepartments(data);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (isMounted) {
+          console.warn('Failed to load departments from Supabase:', err);
+          setError('Could not load departments from database');
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (highlightDept && cardRefs.current[highlightDept]) {
@@ -19,105 +85,46 @@ export const DepartmentGrid: React.FC<DepartmentGridProps> = ({ highlightDept })
         return () => clearTimeout(timer);
       }
     }
-  }, [highlightDept]);
+  }, [highlightDept, departments]);
 
   return (
     <div className="dept-grid" id="deptGrid">
-      {/* CSBS */}
-      <div
-        className="dept-card"
-        data-dept-card="CSBS"
-        ref={(el) => { cardRefs.current['CSBS'] = el; }}
-      >
-        <div className="dept-icon" style={{ background: 'linear-gradient(135deg,#1E4FDB,#3D8BFF)' }}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-            <path d="M3 7l9-4 9 4-9 4-9-4z" />
-            <path d="M3 7v6c0 2 4 4 9 4s9-2 9-4V7" />
-          </svg>
+      {loading && departments.length === 0 && (
+        <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: 'var(--muted)' }}>
+          Loading departments from database...
         </div>
-        <div className="dept-full">CSBS</div>
-        <h4>Computer Science &amp; Business Systems</h4>
-        <p>
-          A TCS-aligned curriculum blending core CS — DSA, DBMS, OS — with business, finance, and product thinking. Built for students headed into product engineering and tech-business hybrid roles.
-        </p>
-      </div>
+      )}
 
-      {/* CSE */}
-      <div
-        className="dept-card"
-        data-dept-card="CSE"
-        ref={(el) => { cardRefs.current['CSE'] = el; }}
-      >
-        <div className="dept-icon" style={{ background: 'linear-gradient(135deg,#0B1E4D,#1E4FDB)' }}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-            <rect x="3" y="4" width="18" height="13" rx="2" />
-            <path d="M8 21h8M12 17v4" />
-          </svg>
+      {error && departments.length === 0 && (
+        <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: '#EF4444' }}>
+          {error}
         </div>
-        <div className="dept-full">CSE</div>
-        <h4>Computer Science &amp; Engineering</h4>
-        <p>
-          The core computing track — algorithms, systems, networks, and software engineering. The largest resource-sharing department on ritresources, with the deepest archive of PYQs and lab manuals.
-        </p>
-      </div>
+      )}
 
-      {/* AI & DS */}
-      <div
-        className="dept-card"
-        data-dept-card="AIDS"
-        ref={(el) => { cardRefs.current['AIDS'] = el; }}
-      >
-        <div className="dept-icon" style={{ background: 'linear-gradient(135deg,#FF8A00,#FFB74D)' }}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-            <path d="M4 19V9M10 19V5M16 19v-7M22 19V3" strokeLinecap="round" />
-          </svg>
+      {departments.map((dept) => (
+        <div
+          key={dept.id}
+          className="dept-card"
+          data-dept-card={dept.id}
+          ref={(el) => {
+            cardRefs.current[dept.id] = el;
+          }}
+        >
+          <div
+            className="dept-icon"
+            style={{
+              background: dept.icon_gradient || 'linear-gradient(135deg,#1E4FDB,#3D8BFF)'
+            }}
+          >
+            {DEPARTMENT_ICONS[dept.id] || DEFAULT_ICON}
+          </div>
+          <div className="dept-full">{dept.name}</div>
+          <h4>{dept.full_name}</h4>
+          <p>{dept.description}</p>
         </div>
-        <div className="dept-full">AI &amp; DS</div>
-        <h4>Artificial Intelligence &amp; Data Science</h4>
-        <p>
-          Statistics, data engineering, and applied ML — turning raw data into decisions. Popular resource categories here are Python notes, ML assignments, and dataset-driven mini-projects.
-        </p>
-      </div>
+      ))}
 
-      {/* AI & ML */}
-      <div
-        className="dept-card"
-        data-dept-card="AIML"
-        ref={(el) => { cardRefs.current['AIML'] = el; }}
-      >
-        <div className="dept-icon" style={{ background: 'linear-gradient(135deg,#3D8BFF,#7EB2FF)' }}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-            <circle cx="12" cy="12" r="3" />
-            <path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" />
-          </svg>
-        </div>
-        <div className="dept-full">AI &amp; ML</div>
-        <h4>Artificial Intelligence &amp; Machine Learning</h4>
-        <p>
-          Deep learning, neural networks, and intelligent systems design. Expect heavier coding-resource traffic here — model notebooks, architecture notes, and research-paper summaries.
-        </p>
-      </div>
-
-      {/* VLSI */}
-      <div
-        className="dept-card"
-        data-dept-card="VLSI"
-        ref={(el) => { cardRefs.current['VLSI'] = el; }}
-      >
-        <div className="dept-icon" style={{ background: 'linear-gradient(135deg,#132B63,#1E4FDB)' }}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-            <rect x="6" y="6" width="12" height="12" rx="1" />
-            <path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4" />
-          </svg>
-        </div>
-        <div className="dept-full">VLSI Design</div>
-        <h4>VLSI &amp; Embedded Systems</h4>
-        <p>
-          Chip design, digital logic, and embedded hardware — from HDL fundamentals to fabrication basics. A smaller but highly focused department archive of lab records and circuit notes.
-        </p>
-      </div>
-
-      {/* RIT Overview */}
+      {/* RIT Overview Card */}
       <div className="dept-card">
         <div className="dept-icon" style={{ background: 'linear-gradient(135deg,#94A3B8,#CBD5E1)' }}>
           <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
@@ -128,7 +135,7 @@ export const DepartmentGrid: React.FC<DepartmentGridProps> = ({ highlightDept })
         <div className="dept-full">RIT Chennai</div>
         <h4>Believe in the Possibilities</h4>
         <p>
-          ritresources is a student-built initiative at Rajalakshmi Institute of Technology — more departments and resource categories are added every semester as the platform grows.
+          REWARE is a student-built initiative at Rajalakshmi Institute of Technology — more departments and resource categories are added every semester as the platform grows.
         </p>
       </div>
     </div>

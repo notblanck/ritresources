@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import type { Resource } from '../types/index.js';
-import { fetchResources, fetchSubjects } from '../services/api.js';
+import type { Resource, Department } from '../types/index.js';
+import { fetchResources, fetchSubjects, fetchDepartments } from '../services/api.js';
 import { CategoryTabs } from '../components/resources/CategoryTabs.js';
 import { FilterSidebar } from '../components/resources/FilterSidebar.js';
 import { ResourceCard } from '../components/resources/ResourceCard.js';
@@ -31,14 +31,16 @@ export const ResourcesPage: React.FC = () => {
   // Data states
   const [resources, setResources] = useState<Resource[]>([]);
   const [subjectsList, setSubjectsList] = useState<string[]>([]);
+  const [departmentsList, setDepartmentsList] = useState<Department[]>([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
-  // Fetch distinct subjects on mount
+  // Fetch distinct subjects and departments on mount
   useEffect(() => {
     fetchSubjects().then((subs) => setSubjectsList(subs));
+    fetchDepartments().then((depts) => setDepartmentsList(depts));
   }, []);
 
   const loadResources = useCallback(async () => {
@@ -167,6 +169,7 @@ export const ResourcesPage: React.FC = () => {
           subject={subject}
           types={selectedTypes}
           subjectsList={subjectsList}
+          departments={departmentsList}
           isOpenMobile={mobileFilterOpen}
           onDeptChange={(d) => { setDept(d); setPage(1); }}
           onSemChange={(s) => { setSem(s); setPage(1); }}

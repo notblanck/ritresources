@@ -20,6 +20,7 @@ export interface Resource {
   subject: string;
   type: ResourceType;
   dept_id: string;
+  department_id?: string;
   semester: string;
   description?: string;
   file_url?: string;

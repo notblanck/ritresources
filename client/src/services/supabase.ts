@@ -1,21 +1,15 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+import { supabase } from '../lib/supabaseClient.js';
 
 export const isSupabaseAuthEnabled = Boolean(
-  supabaseUrl &&
-  supabaseAnonKey &&
-  supabaseUrl.startsWith('http') &&
-  !supabaseUrl.includes('your-project')
+  import.meta.env.VITE_SUPABASE_URL &&
+  import.meta.env.VITE_SUPABASE_ANON_KEY &&
+  !import.meta.env.VITE_SUPABASE_URL.includes('your-project')
 );
 
-export const supabase: SupabaseClient | null = isSupabaseAuthEnabled
-  ? createClient(supabaseUrl, supabaseAnonKey)
-  : null;
+export { supabase };
 
 export async function signUpWithSupabase(email: string, password: string, name: string) {
-  if (supabase) {
+  if (isSupabaseAuthEnabled && supabase) {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -42,7 +36,7 @@ export async function signUpWithSupabase(email: string, password: string, name: 
 }
 
 export async function signInWithSupabase(email: string, password: string) {
-  if (supabase) {
+  if (isSupabaseAuthEnabled && supabase) {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password
@@ -66,7 +60,7 @@ export async function signInWithSupabase(email: string, password: string) {
 }
 
 export async function signOutWithSupabase() {
-  if (supabase) {
+  if (isSupabaseAuthEnabled && supabase) {
     await supabase.auth.signOut();
   }
 }

@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Department } from '../../types/index.js';
 
 interface FilterSidebarProps {
   dept: string;
@@ -6,6 +7,7 @@ interface FilterSidebarProps {
   subject: string;
   types: Set<string>;
   subjectsList: string[];
+  departments?: Department[];
   isOpenMobile: boolean;
   onDeptChange: (dept: string) => void;
   onSemChange: (sem: string) => void;
@@ -29,6 +31,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   subject,
   types,
   subjectsList,
+  departments,
   isOpenMobile,
   onDeptChange,
   onSemChange,
@@ -47,11 +50,21 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
         </label>
         <select id="fDept" value={dept} onChange={(e) => onDeptChange(e.target.value)}>
           <option value="all">All Departments</option>
-          <option value="CSBS">CSBS</option>
-          <option value="CSE">CSE</option>
-          <option value="AIDS">AI &amp; DS</option>
-          <option value="AIML">AI &amp; ML</option>
-          <option value="VLSI">VLSI Design</option>
+          {departments && departments.length > 0 ? (
+            departments.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.name}
+              </option>
+            ))
+          ) : (
+            <>
+              <option value="CSBS">CSBS</option>
+              <option value="CSE">CSE</option>
+              <option value="AIDS">AI &amp; DS</option>
+              <option value="AIML">AI &amp; ML</option>
+              <option value="VLSI">VLSI Design</option>
+            </>
+          )}
         </select>
       </div>
 
