@@ -1,14 +1,18 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '../types/database.js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const defaultUrl = 'https://luchjlscqadbnzmbpqgd.supabase.co';
+const defaultAnonKey = 'sb_publishable_olaVAzBkR_sHABnP6IpHfQ_V6BPuanu';
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn(
-    'Supabase environment variables (VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY) are missing. Check client/.env.'
-  );
-}
+const supabaseUrl =
+  import.meta.env.VITE_SUPABASE_URL && !import.meta.env.VITE_SUPABASE_URL.includes('your-project')
+    ? import.meta.env.VITE_SUPABASE_URL
+    : defaultUrl;
 
-// Client-side Supabase instance using only the public anon key
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+const supabaseAnonKey =
+  import.meta.env.VITE_SUPABASE_ANON_KEY && !import.meta.env.VITE_SUPABASE_ANON_KEY.includes('your-anon-key')
+    ? import.meta.env.VITE_SUPABASE_ANON_KEY
+    : defaultAnonKey;
+
+// Client-side Supabase instance using only the public anon key with resilient fallback
+export const supabase: SupabaseClient<Database> = createClient<Database>(supabaseUrl, supabaseAnonKey);
