@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0B1E4D">
 <title>ritresources — Sharing Academic Resources Made Simple</title>
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -425,17 +426,17 @@
   .res-pagination button:disabled{ opacity:.4; cursor:not-allowed; }
 
   /* ===== UPLOAD WIZARD ===== */
-  .steps-bar{ display:flex; align-items:center; justify-content:center; gap:0; margin-bottom:32px; }
-  .step-node{ display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .steps-bar{ display:flex; align-items:center; justify-content:center; width:100%; max-width:520px; margin:0 auto 32px; padding:0 10px; }
+  .step-node{ display:flex; flex-direction:column; align-items:center; gap:8px; flex-shrink:0; }
   .step-circle{
     width:34px; height:34px; border-radius:50%; display:grid; place-items:center;
     background:#E4E8F0; color:var(--muted); font-weight:700; font-size:14px; transition:all .2s ease;
   }
   .step-node.active .step-circle{ background:var(--navy); color:#fff; }
   .step-node.done .step-circle{ background:var(--blue); color:#fff; }
-  .step-label{ font-size:12.5px; font-weight:600; color:var(--muted); }
+  .step-label{ font-size:12.5px; font-weight:600; color:var(--muted); text-align:center; }
   .step-node.active .step-label{ color:var(--navy); }
-  .step-line{ width:90px; height:2px; background:#E4E8F0; margin:0 6px 22px; }
+  .step-line{ flex:1; max-width:90px; min-width:18px; height:2px; background:#E4E8F0; margin:0 8px 22px; }
   .step-line.done{ background:var(--blue); }
 
   .upload-grid{ display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:start; }
@@ -653,6 +654,269 @@
     .login-title{ font-size:26px; }
   }
 
+  /* =========================================================
+     MOBILE NAVIGATION DRAWER & MOBILE-SPECIFIC STYLES
+     ========================================================= */
+
+  /* Mobile Hamburger Button */
+  .mobile-menu-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: #EEF1F6;
+    border: 1px solid #E2E8F0;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.2s ease;
+    z-index: 10;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mobile-menu-btn:hover { background: #E2E7F0; }
+  .mobile-menu-btn .hamburger-bar {
+    width: 20px;
+    height: 2px;
+    background: var(--navy);
+    border-radius: 2px;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+    transform-origin: center;
+  }
+  .mobile-menu-btn.open { background: #E2E7F0; }
+  .mobile-menu-btn.open .hamburger-bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .mobile-menu-btn.open .hamburger-bar:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .mobile-menu-btn.open .hamburger-bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* Mobile Drawer Backdrop */
+  .mobile-drawer-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(11, 30, 77, 0.5);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    z-index: 998; opacity: 0; pointer-events: none;
+    transition: opacity 0.28s ease;
+  }
+  .mobile-drawer-backdrop.active { opacity: 1; pointer-events: auto; }
+
+  /* Mobile Navigation Drawer */
+  .mobile-nav-drawer {
+    position: fixed; top: 0; right: 0; bottom: 0;
+    width: 320px; max-width: 86vw; background: #ffffff;
+    z-index: 999; box-shadow: -10px 0 35px rgba(11, 30, 77, 0.18);
+    display: flex; flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+  }
+  .mobile-nav-drawer.open { transform: translateX(0); }
+  .drawer-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 20px; border-bottom: 1px solid #EEF1F6;
+    position: sticky; top: 0; background: #fff; z-index: 2;
+  }
+  .drawer-close-btn {
+    width: 38px; height: 38px; border-radius: 50%;
+    display: grid; place-items: center; border: none;
+    background: #F1F4F9; color: var(--navy); cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .drawer-close-btn:hover { background: #E2E7F0; transform: scale(1.05); }
+  .drawer-close-btn svg { width: 18px; height: 18px; }
+  .drawer-nav { display: flex; flex-direction: column; gap: 4px; padding: 16px 14px; flex: 1; }
+  .drawer-link {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; border-radius: 12px; border: none;
+    background: transparent; font-size: 15px; font-weight: 600;
+    color: var(--ink); text-align: left; cursor: pointer; width: 100%;
+    transition: all 0.15s ease; min-height: 48px; text-decoration: none;
+    -webkit-tap-highlight-color: transparent; box-sizing: border-box;
+  }
+  .drawer-link svg { width: 20px; height: 20px; color: var(--blue); flex-shrink: 0; }
+  .drawer-link:hover, .drawer-link.active { background: #F0F4FF; color: var(--blue); }
+  .drawer-dept-section { display: flex; flex-direction: column; }
+  .drawer-dept-toggle { justify-content: space-between; }
+  .drawer-link-content { display: flex; align-items: center; gap: 12px; }
+  .drawer-chevron { width: 16px !important; height: 16px !important; color: var(--muted) !important; transition: transform 0.22s ease !important; }
+  .drawer-dept-toggle.open .drawer-chevron { transform: rotate(180deg) !important; }
+  .drawer-dept-sublist { display: none; flex-direction: column; gap: 2px; padding: 4px 0 8px 30px; }
+  .drawer-dept-sublist.open { display: flex; }
+  .drawer-dept-sublist a {
+    display: flex; flex-direction: column; padding: 9px 12px;
+    border-radius: 10px; text-decoration: none; font-size: 13px; color: var(--navy);
+    transition: background 0.15s ease;
+  }
+  .drawer-dept-sublist a:hover { background: #F0F4FF; }
+  .drawer-dept-sublist a strong { font-size: 13.5px; color: var(--navy); font-weight: 700; }
+  .drawer-dept-sublist a span { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .drawer-footer {
+    padding: 18px 20px; border-top: 1px solid #EEF1F6;
+    background: #FAFBFD; position: sticky; bottom: 0;
+  }
+  .drawer-login-btn { width: 100%; justify-content: center; padding: 13px; font-size: 14.5px; }
+
+  /* Mobile Filter Backdrop */
+  .filter-drawer-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(11, 30, 77, 0.5);
+    backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+    z-index: 999; opacity: 0; pointer-events: none;
+    transition: opacity 0.28s ease;
+  }
+  .filter-drawer-backdrop.active { opacity: 1; pointer-events: auto; }
+  .sidebar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .sidebar-close-btn {
+    display: none; width: 36px; height: 36px; border-radius: 50%;
+    border: none; background: #EEF2FA; color: var(--navy);
+    place-items: center; cursor: pointer; transition: background 0.15s ease;
+  }
+  .sidebar-close-btn:hover { background: #E2E7F0; }
+  .sidebar-close-btn svg { width: 18px; height: 18px; }
+
+  /* Responsive Media Queries */
+  @media (max-width: 1080px) {
+    header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 32px; position: sticky; top: 0;
+      background: rgba(248, 250, 252, 0.95);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      z-index: 100; border-bottom: 1px solid rgba(228, 232, 240, 0.85);
+    }
+    .pillnav { display: none !important; }
+    .mobile-menu-btn { display: flex; }
+    .social-rail { display: none !important; }
+    main.hero {
+      grid-template-columns: 1fr; text-align: center;
+      padding: 24px 28px 48px; min-height: auto; gap: 28px;
+    }
+    .divider { margin-left: auto; margin-right: auto; }
+    p.lede { margin-left: auto; margin-right: auto; max-width: 540px; }
+    .cta-row { justify-content: center; margin: 0 auto; max-width: 420px; }
+    .orbit-stage { height: 480px; order: -1; width: 100%; max-width: 100vw; overflow: hidden; }
+    .orbit-canvas { width: 440px; height: 440px; }
+  }
+
+  @media (max-width: 980px) {
+    .res-body { grid-template-columns: 1fr; }
+    .res-sidebar {
+      position: fixed; top: 0; right: 0; bottom: 0;
+      width: 320px; max-width: 86vw; background: #ffffff;
+      z-index: 1000; box-shadow: -10px 0 35px rgba(11, 30, 77, 0.22);
+      border-radius: 0; padding: 24px 20px; overflow-y: auto;
+      transform: translateX(100%);
+      transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex !important;
+    }
+    .res-sidebar.show { transform: translateX(0); }
+    .sidebar-close-btn { display: grid; }
+    .upload-grid { grid-template-columns: 1fr; gap: 20px; }
+    .mission-row { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  }
+
+  @media (max-width: 768px) {
+    header { padding: 14px 20px; }
+    .page-wrap { padding: 20px 20px 60px; }
+    .cat-tabs {
+      display: flex; flex-wrap: nowrap; overflow-x: auto;
+      -webkit-overflow-scrolling: touch; scrollbar-width: none;
+      gap: 6px; padding: 6px; border-radius: 14px;
+      box-shadow: 0 4px 16px rgba(15, 30, 80, 0.05);
+    }
+    .cat-tabs::-webkit-scrollbar { display: none; }
+    .cat-tabs a { flex-shrink: 0; padding: 10px 15px; font-size: 13px; white-space: nowrap; }
+    .res-toolbar { gap: 10px; margin-bottom: 16px; }
+    .res-search { padding: 11px 14px; border-radius: 12px; }
+    .res-filters-btn { padding: 11px 16px; border-radius: 12px; font-size: 13.5px; }
+    .mission-row { grid-template-columns: 1fr; gap: 14px; margin-top: 30px; }
+    .mission-card { padding: 20px; }
+  }
+
+  @media (max-width: 640px) {
+    .page-wrap { padding: 18px 16px 50px; }
+    main.hero { padding: 14px 16px 36px; gap: 20px; }
+    h1.headline { font-size: clamp(28px, 7.8vw, 38px); line-height: 1.12; letter-spacing: -0.5px; margin: 0 0 16px; }
+    .divider { width: 44px; height: 3.5px; margin-bottom: 18px; }
+    p.lede { font-size: 14.5px; line-height: 1.58; margin: 0 auto 24px; padding: 0 6px; }
+    .cta-row { flex-direction: column; width: 100%; max-width: 320px; gap: 10px; margin: 0 auto; }
+    .cta-row .btn { width: 100%; justify-content: center; padding: 14px 20px; font-size: 14.5px; }
+    .scroll-hint { margin: 0 auto 24px; padding: 10px 16px; font-size: 11.5px; }
+    .orbit-stage { height: 380px; max-width: 100vw; }
+    .orbit-canvas { width: 340px; height: 340px; max-width: 95vw; }
+    .ring-outer { width: 290px; height: 290px; }
+    .ring-inner { width: 195px; height: 195px; }
+    .medallion { width: 135px; height: 135px; padding: 10px; }
+    .medallion-mark img { width: 38px; height: 38px; }
+    .medallion-title { font-size: 13px; }
+    .medallion-sub { font-size: 6px; max-width: 100px; margin-top: 2px; }
+    .medallion-tag { font-size: 6px; margin-top: 3px; }
+    .pedestal { width: 240px; height: 60px; bottom: 38px; }
+    .glow-base { width: 200px; height: 48px; bottom: 48px; }
+    .orbit-item .icon-box { width: 36px; height: 36px; border-radius: 10px; }
+    .orbit-item .icon-box svg { width: 18px; height: 18px; }
+    .orbit-item .chip { font-size: 7.5px; padding: 2px 6px; border-radius: 4px; }
+    .orbit-item.support .icon-box { width: 28px; height: 28px; border-radius: 8px; }
+    .orbit-item.support .icon-box svg { width: 13px; height: 13px; }
+    .page-header h2 { font-size: 26px; margin-bottom: 6px; }
+    .page-header p { font-size: 13.5px; line-height: 1.5; }
+    .res-grid { grid-template-columns: 1fr; gap: 14px; }
+    .res-results-bar { flex-direction: row; justify-content: space-between; align-items: center; font-size: 12.5px; margin-bottom: 12px; gap: 8px; }
+    .res-results-bar select { padding: 7px 10px; font-size: 12.5px; max-width: 170px; border-radius: 8px; }
+    .res-card { padding: 18px 16px; border-radius: 16px; }
+    .res-card h4 { font-size: 15px; line-height: 1.4; }
+    .res-card p { font-size: 13px; line-height: 1.5; }
+    .res-footer .dl { min-height: 42px; font-size: 13.5px; padding: 6px 10px; background: #F0F4FF; border-radius: 8px; color: var(--blue); }
+    .res-pagination { gap: 5px; flex-wrap: wrap; margin-top: 24px; }
+    .res-pagination button { min-width: 36px; height: 36px; font-size: 13px; }
+    .steps-bar { margin-bottom: 22px; padding: 0 4px; }
+    .step-line { margin: 0 4px 18px; min-width: 12px; }
+    .step-circle { width: 30px; height: 30px; font-size: 12.5px; }
+    .step-label { font-size: 11px; }
+    .upload-card { padding: 18px 16px; border-radius: 16px; }
+    .upload-card h3 { font-size: 15.5px; margin-bottom: 14px; }
+    .form-field { margin-bottom: 14px; }
+    .form-field label { font-size: 12px; margin-bottom: 5px; }
+    .form-field input, .form-field select, .form-field textarea {
+      font-size: 16px !important; padding: 11px 13px; border-radius: 10px;
+    }
+    .dropzone { padding: 30px 16px; border-radius: 14px; }
+    .dropzone .dz-title { font-size: 14px; }
+    .dropzone .dz-sub { font-size: 12px; }
+    .dropzone .dz-hint { font-size: 11px; }
+    .wizard-actions { flex-direction: column-reverse; gap: 10px; margin-top: 20px; }
+    .wizard-actions .btn { width: 100%; justify-content: center; padding: 13px; font-size: 14.5px; }
+    .dept-grid { grid-template-columns: 1fr; gap: 14px; }
+    .dept-card { padding: 18px 16px; border-radius: 16px; }
+    .about-hero { margin-bottom: 26px; }
+    .about-hero h2 { font-size: 26px; }
+    .about-hero p { font-size: 14px; line-height: 1.6; }
+    .contact-card { padding: 22px 18px; border-radius: 16px; }
+    .toast { width: calc(100% - 32px); max-width: 380px; bottom: 18px; padding: 12px 16px; font-size: 13px; border-radius: 12px; }
+  }
+
+  @media (max-width: 420px) {
+    header { padding: 12px 14px; }
+    .page-wrap { padding: 16px 12px 48px; }
+    .brand-name { font-size: 16px; }
+    .brand-logo { width: 28px; height: 28px; }
+    .cta-login { padding: 8px 14px; font-size: 13px; gap: 6px; }
+    .orbit-stage { height: 320px; }
+    .orbit-canvas { width: 290px; height: 290px; }
+    .ring-outer { width: 240px; height: 240px; }
+    .ring-inner { width: 160px; height: 160px; }
+    .medallion { width: 115px; height: 115px; padding: 8px; }
+    .medallion-mark img { width: 30px; height: 30px; }
+    .medallion-title { font-size: 11px; }
+    .medallion-sub { display: none; }
+    .medallion-tag { font-size: 5.5px; }
+    .pedestal { width: 190px; height: 46px; bottom: 26px; }
+    .glow-base { width: 160px; height: 36px; bottom: 32px; }
+    .res-toolbar { flex-direction: column; gap: 8px; }
+    .res-filters-btn { width: 100%; justify-content: center; }
+    .res-results-bar { flex-direction: column; align-items: flex-start; gap: 6px; }
+    .res-results-bar select { width: 100%; max-width: none; }
+  }
+
 </style>
 
 </head>
@@ -661,7 +925,7 @@
 <div class="bg-decor"></div>
 
 <header>
-  <div class="brand">
+  <div class="brand" data-view="home" style="cursor:pointer;">
     <img src="logo.png" alt="ritresources" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">
     <div class="brand-name">RITRESOURCES</div>
   </div>
@@ -684,11 +948,105 @@
     <a href="#" data-view="contact">Contact</a>
   </nav>
 
-  <button class="cta-login" id="loginBtn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>
-    Login
-  </button>
+  <div style="display:flex; align-items:center; gap:10px;">
+    <button class="cta-login" id="loginBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>
+      Login
+    </button>
+    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation menu">
+      <span class="hamburger-bar"></span>
+      <span class="hamburger-bar"></span>
+      <span class="hamburger-bar"></span>
+    </button>
+  </div>
 </header>
+
+<!-- Mobile Navigation Drawer Backdrop -->
+<div class="mobile-drawer-backdrop" id="drawerBackdrop"></div>
+
+<!-- Mobile Navigation Drawer -->
+<aside class="mobile-nav-drawer" id="mobileNavDrawer" aria-label="Mobile Navigation">
+  <div class="drawer-header">
+    <div class="brand" data-view="home" style="cursor:pointer;">
+      <img src="logo.png" alt="ritresources" class="brand-logo" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
+      <div class="brand-name" style="font-size:17px;">RITRESOURCES</div>
+    </div>
+    <button class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+
+  <nav class="drawer-nav">
+    <a class="drawer-link active" href="#" data-view="home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      Home
+    </a>
+    <a class="drawer-link" href="#" data-view="resources">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+      </svg>
+      Browse Resources
+    </a>
+    <a class="drawer-link" href="#" data-view="upload">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M7 18a5 5 0 0 1-1-9.9A6 6 0 0 1 18 8a4.5 4.5 0 0 1-.5 9H7z"></path>
+        <path d="M12 12v6M9 15l3-3 3 3"></path>
+      </svg>
+      Upload Resource
+    </a>
+
+    <div class="drawer-dept-section">
+      <button class="drawer-link drawer-dept-toggle" id="drawerDeptToggle" type="button">
+        <div class="drawer-link-content">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+          </svg>
+          Departments
+        </div>
+        <svg class="drawer-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M6 9l6 6 6-6"></path>
+        </svg>
+      </button>
+      <div class="drawer-dept-sublist" id="drawerDeptSublist">
+        <a href="#" data-dept="CSBS"><strong>CSBS</strong> <span>Computer Science &amp; Business Systems</span></a>
+        <a href="#" data-dept="CSE"><strong>CSE</strong> <span>Computer Science &amp; Engineering</span></a>
+        <a href="#" data-dept="AIDS"><strong>AI &amp; DS</strong> <span>Artificial Intelligence &amp; Data Science</span></a>
+        <a href="#" data-dept="AIML"><strong>AI &amp; ML</strong> <span>Artificial Intelligence &amp; Machine Learning</span></a>
+        <a href="#" data-dept="VLSI"><strong>VLSI Design</strong> <span>VLSI &amp; Embedded Systems</span></a>
+      </div>
+    </div>
+
+    <a class="drawer-link" href="#" data-view="about">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+      About
+    </a>
+    <a class="drawer-link" href="#" data-view="contact">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+        <polyline points="22,6 12,13 2,6"></polyline>
+      </svg>
+      Contact
+    </a>
+  </nav>
+
+  <div class="drawer-footer">
+    <button class="btn btn-primary drawer-login-btn" id="drawerLoginBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"></path></svg>
+      Login to ritresources
+    </button>
+  </div>
+</aside>
 
 <section id="view-home" class="view active">
 <main class="hero">
@@ -771,8 +1129,17 @@
     </div>
 
     <div class="res-body">
+      <div class="filter-drawer-backdrop" id="filterDrawerBackdrop"></div>
       <aside class="res-sidebar" id="resSidebar">
-        <h3>Filter By</h3>
+        <div class="sidebar-header">
+          <h3>Filter Resources</h3>
+          <button class="sidebar-close-btn" id="filterCloseBtn" aria-label="Close filters">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
         <div class="filter-group">
           <label class="field-label">Department</label>
           <select id="fDept">

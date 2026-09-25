@@ -30,6 +30,22 @@ export const HeroOrbit: React.FC = () => {
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    const getRadiusScale = () => {
+      const w = window.innerWidth;
+      if (w <= 360) return 0.52;
+      if (w <= 420) return 0.58;
+      if (w <= 480) return 0.65;
+      if (w <= 640) return 0.74;
+      if (w <= 980) return 0.85;
+      return 1.0;
+    };
+    let radiusScale = getRadiusScale();
+
+    const handleResize = () => {
+      radiusScale = getRadiusScale();
+    };
+    window.addEventListener('resize', handleResize);
+
     const items = [
       { label: 'NOTES', icon: 'folder', radius: 225, speed: 0.10, phase: 0 * DEG, bobAmp: 8, bobSpeed: 1.3, color: '#1E4FDB', el: null as HTMLDivElement | null },
       { label: 'ASSIGNMENTS', icon: 'clipboard', radius: 225, speed: 0.10, phase: 72 * DEG, bobAmp: 7, bobSpeed: 1.1, color: '#3D8BFF', el: null as HTMLDivElement | null },
@@ -108,36 +124,40 @@ export const HeroOrbit: React.FC = () => {
 
       items.forEach((it) => {
         const angle = it.phase + time * it.speed;
-        const x = Math.cos(angle) * it.radius;
-        const yBase = Math.sin(angle) * it.radius * SQUASH;
-        const bob = Math.sin(time * it.bobSpeed + it.phase) * it.bobAmp;
+        const currentRadius = it.radius * radiusScale;
+        const x = Math.cos(angle) * currentRadius;
+        const yBase = Math.sin(angle) * currentRadius * SQUASH;
+        const bob = Math.sin(time * it.bobSpeed + it.phase) * (it.bobAmp * radiusScale);
         const y = yBase + bob;
         const front = Math.sin(angle) > -0.15;
-        const scale = 0.8 + 0.25 * ((Math.sin(angle) + 1) / 2);
+        const baseScale = radiusScale < 0.7 ? 0.65 : 0.8;
+        const scale = (baseScale + 0.22 * ((Math.sin(angle) + 1) / 2)) * Math.min(1, radiusScale * 1.15);
         place(it.el, x, y, scale, front);
       });
 
       support.forEach((it) => {
         const angle = it.phase + time * it.speed;
-        const x = Math.cos(angle) * it.radius;
-        const yBase = Math.sin(angle) * it.radius * SQUASH;
-        const bob = Math.sin(time * it.bobSpeed + it.phase) * it.bobAmp;
+        const currentRadius = it.radius * radiusScale;
+        const x = Math.cos(angle) * currentRadius;
+        const yBase = Math.sin(angle) * currentRadius * SQUASH;
+        const bob = Math.sin(time * it.bobSpeed + it.phase) * (it.bobAmp * radiusScale);
         const y = yBase + bob;
         const front = Math.sin(angle) > -0.15;
-        const scale = 0.75 + 0.2 * ((Math.sin(angle) + 1) / 2);
+        const baseScale = radiusScale < 0.7 ? 0.55 : 0.75;
+        const scale = (baseScale + 0.18 * ((Math.sin(angle) + 1) / 2)) * Math.min(1, radiusScale * 1.15);
         place(it.el, x, y, scale, front);
       });
 
       particles.forEach((p) => {
         const angle = p.phase + time * p.speed;
-        const wob = Math.sin(time * 0.4 + p.phase) * 12;
-        const r = p.radius + wob;
+        const wob = Math.sin(time * 0.4 + p.phase) * (12 * radiusScale);
+        const r = (p.radius + wob) * radiusScale;
         const x = Math.cos(angle) * r;
         const y = Math.sin(angle) * r * SQUASH;
         const front = Math.sin(angle) > -0.1;
         const opacity = 0.35 + 0.5 * ((Math.sin(angle) + 1) / 2);
         if (p.el) {
-          p.el.style.transform = `translate(${x}px,${y}px)`;
+          p.el.style.transform = `translate(${x}px,${y}px) scale(${radiusScale})`;
           p.el.style.opacity = String(opacity);
           p.el.style.zIndex = front ? '11' : '3';
         }
@@ -167,13 +187,34 @@ export const HeroOrbit: React.FC = () => {
       canvas.style.transform = 'rotateX(0deg) rotateY(0deg)';
     };
 
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        const touch = e.touches[0];
+        const rect = stage.getBoundingClientRect();
+        const relX = (touch.clientX - rect.left) / rect.width - 0.5;
+        const relY = (touch.clientY - rect.top) / rect.height - 0.5;
+        const rotY = relX * 8;
+        const rotX = -relY * 6;
+        canvas.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+      }
+    };
+
+    const handleTouchEnd = () => {
+      canvas.style.transform = 'rotateX(0deg) rotateY(0deg)';
+    };
+
     stage.addEventListener('mousemove', handleMouseMove);
     stage.addEventListener('mouseleave', handleMouseLeave);
+    stage.addEventListener('touchmove', handleTouchMove, { passive: true });
+    stage.addEventListener('touchend', handleTouchEnd);
 
     return () => {
       cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('resize', handleResize);
       stage.removeEventListener('mousemove', handleMouseMove);
       stage.removeEventListener('mouseleave', handleMouseLeave);
+      stage.removeEventListener('touchmove', handleTouchMove);
+      stage.removeEventListener('touchend', handleTouchEnd);
       // Clean up injected DOM elements
       items.forEach((it) => it.el?.remove());
       support.forEach((it) => it.el?.remove());

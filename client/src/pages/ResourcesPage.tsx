@@ -37,6 +37,18 @@ export const ResourcesPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
+  // Lock body scroll when mobile filter is open
+  useEffect(() => {
+    if (mobileFilterOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileFilterOpen]);
+
   // Fetch distinct subjects and departments on mount
   useEffect(() => {
     fetchSubjects().then((subs) => setSubjectsList(subs));
@@ -163,6 +175,13 @@ export const ResourcesPage: React.FC = () => {
 
       {/* Main Body: Sidebar + Grid */}
       <div className="res-body">
+        {/* Mobile Filter Backdrop */}
+        <div
+          className={`filter-drawer-backdrop ${mobileFilterOpen ? 'active' : ''}`}
+          onClick={() => setMobileFilterOpen(false)}
+          aria-hidden="true"
+        />
+
         <FilterSidebar
           dept={dept}
           sem={sem}
@@ -177,6 +196,7 @@ export const ResourcesPage: React.FC = () => {
           onTypeToggle={handleTypeToggle}
           onApply={handleApplyFilters}
           onReset={handleResetFilters}
+          onCloseMobile={() => setMobileFilterOpen(false)}
         />
 
         <main>

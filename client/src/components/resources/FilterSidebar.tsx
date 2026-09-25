@@ -15,6 +15,7 @@ interface FilterSidebarProps {
   onTypeToggle: (type: string) => void;
   onApply: () => void;
   onReset: () => void;
+  onCloseMobile?: () => void;
 }
 
 const ALL_TYPES = [
@@ -38,11 +39,22 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   onSubjectChange,
   onTypeToggle,
   onApply,
-  onReset
+  onReset,
+  onCloseMobile
 }) => {
   return (
     <aside className={`res-sidebar ${isOpenMobile ? 'show' : ''}`} id="resSidebar">
-      <h3>Filter Resources</h3>
+      <div className="sidebar-header">
+        <h3>Filter Resources</h3>
+        {onCloseMobile && (
+          <button className="sidebar-close-btn" onClick={onCloseMobile} aria-label="Close filters">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        )}
+      </div>
 
       <div className="filter-group">
         <label className="field-label" htmlFor="fDept">
