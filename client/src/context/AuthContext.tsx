@@ -1,12 +1,19 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { UserProfile } from '../types/index.js';
-import { supabase, signInWithSupabase, signUpWithSupabase, signOutWithSupabase } from '../services/supabase.js';
+import {
+  supabase,
+  signInWithSupabase,
+  signUpWithSupabase,
+  signInWithGoogle,
+  signOutWithSupabase
+} from '../services/supabase.js';
 
 interface AuthContextType {
   user: UserProfile | null;
   login: (email: string, password: string) => Promise<void>;
   signup: (name: string, email: string, password: string) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -70,6 +77,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     localStorage.setItem('ritresources_user', JSON.stringify(profile));
   };
 
+  const loginWithGoogle = async () => {
+    await signInWithGoogle();
+  };
+
   const logout = async () => {
     await signOutWithSupabase();
     setUser(null);
@@ -78,7 +89,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, login, signup, loginWithGoogle, logout }}>
       {children}
     </AuthContext.Provider>
   );
