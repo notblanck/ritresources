@@ -2,10 +2,12 @@ import type { Resource, Department, ResourceType } from '../types/index.js';
 import { supabase } from '../lib/supabaseClient.js';
 import type { Database } from '../types/database.js';
 
-export const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+export const API_BASE = import.meta.env.VITE_API_URL || '';
 
-export function getResourceDownloadUrl(resourceId: string): string {
-  return `${API_BASE}/resources/${resourceId}/download`;
+export function getResourceDownloadUrl(resourceId: string, fileUrl?: string): string {
+  if (fileUrl) return fileUrl;
+  if (API_BASE) return `${API_BASE}/resources/${resourceId}/download`;
+  return '';
 }
 
 export interface GetResourcesParams {
@@ -174,31 +176,55 @@ export async function createResourceApi(formData: FormData): Promise<Resource> {
   const semester = (formData.get('semester') as string) || '1st Year';
   const description = (formData.get('description') as string) || '';
   const visibility = (formData.get('visibility') as string) || 'Visible to all students';
-  const uploader_name = (formData.get('uploader_name') as string) || 'Anonymous Student';
-  const uploader_email = (formData.get('uploader_email') as string) || undefined;
+  let uploader_name = (formData.get('uploader_name') as string) || 'Anonymous Student';
+  let uploader_email = (formData.get('uploader_email') as string) || undefined;
   const file = formData.get('file') as File | null;
 
-  let file_url: string | undefined;
-  let file_name = file?.name;
-  let file_size = file?.size;
-  let file_type = file?.type;
+  // Identify current authenticated user if logged in
+  let currentUserId: string | null = null;
+  try {
+    const { data: authData } = await supabase.auth.getUser();
+    if (authData?.user) {
+      currentUserId = authData.user.id;
+      uploader_email = authData.user.email || uploader_email;
+      uploader_name =
+        authData.user.user_metadata?.full_name ||
+        authData.user.user_metadata?.name ||
+        uploader_name;
+    }
+  } catch {
+    // Guest or unauthenticated upload fallback
+  }
 
-  // If a file is uploaded, attempt to store it in Supabase Storage if configured
+  let file_url: string | undefined;
+  const file_name = file?.name;
+  const file_size = file?.size;
+  const file_type = file?.type;
+
+  // If a file is uploaded, store it in Supabase Storage
   if (file && file.name) {
     try {
-      const cleanName = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
+      const fileExt = file.name.split('.').pop() || '';
+      const baseName = file.name.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_');
+      const cleanName = `${Date.now()}_${baseName}${fileExt ? `.${fileExt}` : ''}`;
+
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('resources')
-        .upload(cleanName, file);
+        .upload(cleanName, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
 
       if (!uploadError && uploadData) {
         const { data: publicUrlData } = supabase.storage
           .from('resources')
           .getPublicUrl(cleanName);
         file_url = publicUrlData.publicUrl;
+      } else if (uploadError) {
+        console.warn('Supabase storage upload error:', uploadError);
       }
-    } catch {
-      // Storage upload optional fallback
+    } catch (uploadErr) {
+      console.warn('Storage upload exception:', uploadErr);
     }
   }
 
@@ -213,7 +239,9 @@ export async function createResourceApi(formData: FormData): Promise<Resource> {
     description,
     visibility,
     uploader_name,
-    uploader_email,
+    uploader_email: uploader_email || undefined,
+    uploader_id: currentUserId || undefined,
+    uploaded_by: currentUserId || undefined,
     file_url,
     file_name,
     file_size,
@@ -258,6 +286,24 @@ export async function createResourceApi(formData: FormData): Promise<Resource> {
 
 export async function registerDownload(resourceId: string): Promise<{ downloads_count: number; file_url?: string }> {
   try {
+    // 1. Try atomic database RPC
+    const { data: rpcCount, error: rpcErr } = await supabase.rpc('increment_resource_downloads', {
+      resource_id: resourceId
+    });
+
+    if (!rpcErr && typeof rpcCount === 'number') {
+      const { data } = await supabase
+        .from('resources')
+        .select('file_url')
+        .eq('id', resourceId)
+        .single();
+      return {
+        downloads_count: rpcCount,
+        file_url: (data as { file_url: string | null } | null)?.file_url || undefined
+      };
+    }
+
+    // 2. Direct fallback
     const { data } = await supabase
       .from('resources')
       .select('downloads_count, file_url')
@@ -266,15 +312,87 @@ export async function registerDownload(resourceId: string): Promise<{ downloads_
 
     type DownloadRow = { downloads_count: number | null; file_url: string | null };
     const row = data as unknown as DownloadRow;
+    const nextCount = (row?.downloads_count || 0) + 1;
+
+    await supabase
+      .from('resources')
+      .update({ downloads_count: nextCount })
+      .eq('id', resourceId);
 
     return {
-      downloads_count: (row?.downloads_count || 0) + 1,
+      downloads_count: nextCount,
       file_url: row?.file_url || undefined
     };
   } catch (err) {
     console.warn('Download registration error:', err);
     return { downloads_count: 0 };
   }
+}
+
+export async function downloadResource(resource: Resource): Promise<void> {
+  // 1. Register and increment download count in Supabase
+  registerDownload(resource.id).catch((err) => console.warn('Could not register download:', err));
+
+  // 2. If a physical remote file exists (e.g. Supabase Storage or direct link)
+  if (resource.file_url && resource.file_url.startsWith('http')) {
+    try {
+      const res = await fetch(resource.file_url, { mode: 'cors' });
+      if (res.ok) {
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = resource.file_name || `${resource.title.replace(/[^a-zA-Z0-9_-]/g, '_')}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+        return;
+      }
+    } catch (err) {
+      console.warn('Direct blob fetch failed, opening URL in new window:', err);
+    }
+    window.open(resource.file_url, '_blank', 'noopener,noreferrer');
+    return;
+  }
+
+  // 3. Fallback for seed resources without physical files on disk:
+  // Generate a clean text document representation and trigger browser download
+  const content = [
+    '=========================================================',
+    'ritresources — Academic Resource Sharing Platform',
+    'Rajalakshmi Institute of Technology, Chennai',
+    '=========================================================',
+    '',
+    `Title: ${resource.title}`,
+    `Subject: ${resource.subject}`,
+    `Resource Type: ${resource.type}`,
+    `Department: ${resource.dept_id || resource.department_id || 'All'}`,
+    `Semester / Year: ${resource.semester}`,
+    `Uploader: ${resource.uploader_name || 'Anonymous Student'}`,
+    '',
+    'Description:',
+    resource.description || 'No additional description provided.',
+    '',
+    '=========================================================',
+    'This academic resource was downloaded from ritresources.',
+    'Platform URL: https://reware-academic-resource-sharing-ve.vercel.app',
+    '========================================================='
+  ].join('\n');
+
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const blobUrl = URL.createObjectURL(blob);
+  const fallbackFileName = resource.file_name?.endsWith('.pdf')
+    ? resource.file_name.replace(/\.pdf$/i, '.txt')
+    : (resource.file_name || `${resource.title.replace(/[^a-zA-Z0-9_-]/g, '_')}.txt`);
+
+  const a = document.createElement('a');
+  a.href = blobUrl;
+  a.download = fallbackFileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
 }
 
 export async function sendContactMessage(payload: { name: string; email: string; message: string }): Promise<void> {

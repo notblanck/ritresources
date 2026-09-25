@@ -237,6 +237,10 @@ export type Database = {
     Functions: {
       get_my_department: { Args: never; Returns: string };
       get_my_role: { Args: never; Returns: string };
+      increment_resource_downloads: {
+        Args: { resource_id: string };
+        Returns: number;
+      };
     };
     Enums: {
       [_ in never]: never;

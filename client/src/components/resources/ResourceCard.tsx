@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { Resource } from '../../types/index.js';
-import { getResourceDownloadUrl } from '../../services/api.js';
+import { downloadResource } from '../../services/api.js';
 import { useToast } from '../../context/ToastContext.js';
 
 interface ResourceCardProps {
@@ -40,22 +40,15 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
   const color = TYPE_COLORS[resource.type] || '#1E4FDB';
   const dateLabel = formatDaysAgo(resource.days_ago, resource.created_at);
 
-  const handleDownload = (e: React.MouseEvent) => {
+  const handleDownload = async (e: React.MouseEvent) => {
     e.stopPropagation();
     try {
       setDownloadCount((prev) => prev + 1);
       showToast(`Downloading "${resource.title}"...`);
-
-      // Stream file directly from server download endpoint
-      const downloadUrl = getResourceDownloadUrl(resource.id);
-      const a = document.createElement('a');
-      a.href = downloadUrl;
-      a.download = resource.file_name || `${resource.title.replace(/\s+/g, '_')}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      await downloadResource(resource);
     } catch (err) {
       console.warn('Download error:', err);
+      showToast('Download could not be completed. Please try again.');
     }
   };
 
